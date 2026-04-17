@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1440">
+    <title>GoldenBank 智能合规审查系统</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #1a2a4a 50%, #0d1a2d 100%);
+            width: 1440px; min-height: 1080px;
+            padding: 35px 40px; color: #fff;
+        }
+        .container { width: 1360px; margin: 0 auto; }
+        
+        /* Header */
+        .header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 22px; padding: 16px 26px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .logo { display: flex; align-items: center; gap: 14px; }
+        .logo-icon {
+            width: 46px; height: 46px;
+            background: linear-gradient(135deg, #c9a227 0%, #f0d878 100%);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; font-weight: 800; color: #0a1628;
+        }
+        .bank-name { font-size: 12px; color: #8a9ab0; letter-spacing: 2px; }
+        .system-title {
+            font-size: 24px; font-weight: 700;
+            background: linear-gradient(90deg, #fff 0%, #8a9ab0 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .badge {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #00d26a 0%, #00a854 100%);
+            border-radius: 30px;
+            font-size: 12px; font-weight: 600;
+        }
+        
+        /* Main Grid */
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 22px; }
+        .panel {
+            background: rgba(255,255,255,0.03);
+            border-radius: 18px;
+            padding: 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .panel-title {
+            font-size: 14px; color: #8a9ab0; margin-bottom: 18px;
+            display: flex; align-items: center; gap: 10px; font-weight: 600;
+        }
+        .panel-title::before {
+            content: ''; width: 4px; height: 16px;
+            background: linear-gradient(180deg, #c9a227 0%, #f0d878 100%);
+            border-radius: 2px;
+        }
+        
+        /* Skill Flow */
+        .skill-flow { display: flex; flex-direction: column; gap: 11px; }
+        .flow-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 13px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border-left: 3px solid #c9a227;
+        }
+        .flow-icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; font-weight: 700;
+        }
+        .flow-item:nth-child(1) .flow-icon { background: rgba(0,210,106,0.2); color: #00d26a; }
+        .flow-item:nth-child(2) .flow-icon { background: rgba(201,162,39,0.2); color: #c9a227; }
+        .flow-item:nth-child(3) .flow-icon { background: rgba(100,149,237,0.2); color: #6495ed; }
+        .flow-item:nth-child(4) .flow-icon { background: rgba(138,154,176,0.2); color: #8a9ab0; }
+        .flow-text { flex: 1; }
+        .flow-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+        .flow-desc { font-size: 11px; color: #8a9ab0; }
+        .flow-status {
+            padding: 4px 11px; border-radius: 20px;
+            font-size: 11px; font-weight: 600;
+            background: rgba(0,210,106,0.15); color: #00d26a;
+        }
+        
+        /* Metrics */
+        .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 13px; }
+        .metric-card {
+            padding: 18px 12px; background: rgba(255,255,255,0.05);
+            border-radius: 13px; text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .metric-icon { 
+            width: 32px; height: 32px; margin: 0 auto 10px;
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 700;
+            background: rgba(201,162,39,0.15); color: #c9a227;
+        }
+        .metric-value {
+            font-size: 24px; font-weight: 700;
+            background: linear-gradient(180deg, #fff 0%, #c9a227 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+        .metric-label { font-size: 11px; color: #8a9ab0; }
+        
+        /* Bottom Section - Flex Layout */
+        .bottom-wrapper { display: flex; gap: 22px; }
+        
+        .pass-rate {
+            flex: 1.3;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 28px 32px;
+            background: linear-gradient(135deg, rgba(0,210,106,0.1) 0%, rgba(0,168,84,0.05) 100%);
+            border-radius: 18px;
+            border: 2px solid rgba(0,210,106,0.3);
+        }
+        .rate-circle {
+            width: 160px; height: 160px; border-radius: 50%;
+            background: conic-gradient(from 0deg, #00d26a 0%, #00d26a 100%);
+            display: flex; align-items: center; justify-content: center;
+            position: relative; margin-bottom: 20px;
+            box-shadow: 0 0 50px rgba(0,210,106,0.3);
+        }
+        .rate-circle::before {
+            content: ''; position: absolute;
+            width: 130px; height: 130px; background: #0a1628; border-radius: 50%;
+        }
+        .rate-content { position: relative; z-index: 1; text-align: center; }
+        .rate-number {
+            font-size: 48px; font-weight: 800; color: #00d26a;
+            text-shadow: 0 0 25px rgba(0,210,106,0.5);
+        }
+        .rate-label { font-size: 12px; color: #8a9ab0; margin-top: 4px; }
+        .pass-text {
+            font-size: 16px; font-weight: 600;
+            text-align: center; line-height: 1.6;
+        }
+        .pass-text span { color: #00d26a; font-weight: 700; }
+        
+        .stats { 
+            flex: 1;
+            display: flex; flex-direction: column; 
+            gap: 10px;
+        }
+        .stat-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 18px; background: rgba(255,255,255,0.05); border-radius: 12px;
+            flex: 1;
+        }
+        .stat-label { font-size: 12px; color: #8a9ab0; }
+        .stat-value { font-size: 16px; font-weight: 700; color: #fff; }
+        .highlight { color: #c9a227; }
+        
+        .tags { margin-top: 18px; display: flex; gap: 10px; justify-content: center; }
+        .tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 13px; background: rgba(201,162,39,0.15);
+            color: #c9a227; border-radius: 20px;
+            font-size: 11px; font-weight: 500;
+        }
+        .tag::before {
+            content: ''; width: 5px; height: 5px; background: #c9a227; border-radius: 50%;
+        }
+        
+        .footer {
+            margin-top: 22px; padding: 12px; text-align: center;
+            font-size: 11px; color: #5a6a80;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">金</div>
+                <div>
+                    <div class="bank-name">某大型商业银行</div>
+                    <div style="font-size:16px;font-weight:700;letter-spacing:1px">GoldenBank</div>
+                </div>
+            </div>
+            <div class="system-title">智能合规审查系统 · Intelligent Compliance Review</div>
+            <div class="badge">✓ 已通过生产验证</div>
+        </div>
+        
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Left: Skill Flow -->
+            <div class="panel">
+                <div class="panel-title">Skill 调用流程</div>
+                <div class="skill-flow">
+                    <div class="flow-item">
+                        <div class="flow-icon">1</div>
+                        <div class="flow-text">
+                            <div class="flow-title">送审材料接入</div>
+                            <div class="flow-desc">多格式文档自动解析与标准化</div>
+                        </div>
+                        <div class="flow-status">完成</div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-icon">2</div>
+                        <div class="flow-text">
+                            <div class="flow-title">Skill 智能审查</div>
+                            <div class="flow-desc">全方位合规规则引擎自动检测</div>
+                        </div>
+                        <div class="flow-status">运行中</div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-icon">3</div>
+                        <div class="flow-text">
+                            <div class="flow-title">风险评估分析</div>
+                            <div class="flow-desc">AI 驱动的多维度风险量化</div>
+                        </div>
+                        <div class="flow-status">完成</div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-icon">4</div>
+                        <div class="flow-text">
+                            <div class="flow-title">合规报告生成</div>
+                            <div class="flow-desc">结构化审计报告一键输出</div>
+                        </div>
+                        <div class="flow-status">完成</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right: Metrics -->
+            <div class="panel">
+                <div class="panel-title">全方位审核维度</div>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">✓</div>
+                        <div class="metric-value">完整</div>
+                        <div class="metric-label">文档完整性审查</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">§</div>
+                        <div class="metric-value">合规</div>
+                        <div class="metric-label">法规政策符合性</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">S</div>
+                        <div class="metric-value">安全</div>
+                        <div class="metric-label">数据安全与隐私</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">%</div>
+                        <div class="metric-value">准确</div>
+                        <div class="metric-label">财务数据准确性</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">=</div>
+                        <div class="metric-value">一致</div>
+                        <div class="metric-label">内部流程一致性</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">!</div>
+                        <div class="metric-value">实时</div>
+                        <div class="metric-label">风险预警监控</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Section - Flex Layout -->
+        <div class="bottom-wrapper">
+            <!-- Pass Rate -->
+            <div class="pass-rate">
+                <div class="rate-circle">
+                    <div class="rate-content">
+                        <div class="rate-number">100%</div>
+                        <div class="rate-label">审计通过率</div>
+                    </div>
+                </div>
+                <div class="pass-text">
+                    送审材料经 <span>Skill 智能审查引擎</span> 全方位审核<br>
+                    合规性、完整性、准确性三重保障
+                </div>
+                <div class="tags">
+                    <span class="tag">金融级安全</span>
+                    <span class="tag">实时审查</span>
+                    <span class="tag">AI 驱动</span>
+                </div>
+            </div>
+            
+            <!-- Stats -->
+            <div class="stats">
+                <div class="stat-row">
+                    <span class="stat-label">今日审查文档</span>
+                    <span class="stat-value highlight">2,847</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">平均审查时长</span>
+                    <span class="stat-value">3.2分钟</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">人工复核率</span>
+                    <span class="stat-value highlight">0%</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">系统可用性</span>
+                    <span class="stat-value">99.99%</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">累计审查文档</span>
+                    <span class="stat-value highlight">128万+</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            GoldenBank 智能合规审查系统 | 采用先进的 Skill 技术架构 | 让合规审查更智能、更高效、更可靠
+        </div>
+    </div>
+</body>
+</html>

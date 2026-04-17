@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1440">
+    <title>XX市行政审批局 - 智能材料审核系统</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0d1b2a 0%, #1b3a5f 50%, #0d1b2a 100%);
+            width: 1440px; min-height: 1080px;
+            padding: 35px 40px; color: #fff;
+        }
+        .container { width: 1360px; margin: 0 auto; }
+        
+        /* Header */
+        .header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 22px; padding: 16px 26px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .logo { display: flex; align-items: center; gap: 14px; }
+        .logo-icon {
+            width: 46px; height: 46px;
+            background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; font-weight: 800; color: #fff;
+        }
+        .gov-name { font-size: 12px; color: #94a3b8; letter-spacing: 2px; }
+        .system-title {
+            font-size: 24px; font-weight: 700;
+            background: linear-gradient(90deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .badge {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 30px;
+            font-size: 12px; font-weight: 600;
+        }
+        
+        /* Main Grid */
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 22px; }
+        .panel {
+            background: rgba(255,255,255,0.03);
+            border-radius: 18px;
+            padding: 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .panel-title {
+            font-size: 14px; color: #94a3b8; margin-bottom: 18px;
+            display: flex; align-items: center; gap: 10px; font-weight: 600;
+        }
+        .panel-title::before {
+            content: ''; width: 4px; height: 16px;
+            background: linear-gradient(180deg, #2563eb 0%, #60a5fa 100%);
+            border-radius: 2px;
+        }
+        
+        /* Skill Flow */
+        .skill-flow { display: flex; flex-direction: column; gap: 11px; }
+        .flow-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 13px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border-left: 3px solid #2563eb;
+        }
+        .flow-icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; font-weight: 700;
+        }
+        .flow-item:nth-child(1) .flow-icon { background: rgba(37,99,235,0.2); color: #60a5fa; }
+        .flow-item:nth-child(2) .flow-icon { background: rgba(16,185,129,0.2); color: #10b981; }
+        .flow-item:nth-child(3) .flow-icon { background: rgba(245,158,11,0.2); color: #f59e0b; }
+        .flow-item:nth-child(4) .flow-icon { background: rgba(139,92,246,0.2); color: #8b5cf6; }
+        .flow-text { flex: 1; }
+        .flow-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+        .flow-desc { font-size: 11px; color: #94a3b8; }
+        .flow-status {
+            padding: 4px 11px; border-radius: 20px;
+            font-size: 11px; font-weight: 600;
+            background: rgba(16,185,129,0.15); color: #10b981;
+        }
+        .flow-warning {
+            padding: 4px 11px; border-radius: 20px;
+            font-size: 11px; font-weight: 600;
+            background: rgba(245,158,11,0.15); color: #f59e0b;
+        }
+        
+        /* Features */
+        .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 13px; }
+        .feature-card {
+            padding: 18px 12px; background: rgba(255,255,255,0.05);
+            border-radius: 13px; text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .feature-icon { 
+            width: 32px; height: 32px; margin: 0 auto 10px;
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 700;
+        }
+        .feature-card:nth-child(1) .feature-icon { background: rgba(37,99,235,0.2); color: #60a5fa; }
+        .feature-card:nth-child(2) .feature-icon { background: rgba(245,158,11,0.2); color: #f59e0b; }
+        .feature-card:nth-child(3) .feature-icon { background: rgba(16,185,129,0.2); color: #10b981; }
+        .feature-card:nth-child(4) .feature-icon { background: rgba(139,92,246,0.2); color: #8b5cf6; }
+        .feature-value {
+            font-size: 22px; font-weight: 700;
+            background: linear-gradient(180deg, #fff 0%, #60a5fa 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+        .feature-label { font-size: 11px; color: #94a3b8; }
+        
+        /* Bottom Section */
+        .bottom-wrapper { display: flex; gap: 22px; }
+        
+        .efficiency-highlight {
+            flex: 1.3;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 28px 32px;
+            background: linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(5,150,105,0.05) 100%);
+            border-radius: 18px;
+            border: 2px solid rgba(16,185,129,0.4);
+        }
+        .big-number {
+            font-size: 80px; font-weight: 800; color: #10b981;
+            text-shadow: 0 0 40px rgba(16,185,129,0.5);
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+        .big-label { font-size: 18px; color: #10b981; font-weight: 600; margin-bottom: 20px; }
+        .highlight-text {
+            font-size: 16px; font-weight: 600;
+            text-align: center; line-height: 1.6;
+        }
+        .highlight-text span { color: #10b981; font-weight: 700; }
+        
+        .missing-alert {
+            margin-top: 18px;
+            padding: 14px 24px;
+            background: rgba(245,158,11,0.1);
+            border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 12px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .alert-icon {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(245,158,11,0.2);
+            display: flex; align-items: center; justify-content: center;
+            color: #f59e0b; font-weight: 700;
+        }
+        .alert-text { font-size: 13px; color: #f59e0b; }
+        
+        .stats { 
+            flex: 1;
+            display: flex; flex-direction: column; 
+            gap: 10px;
+        }
+        .stat-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 18px; background: rgba(255,255,255,0.05); border-radius: 12px;
+            flex: 1;
+        }
+        .stat-label { font-size: 12px; color: #94a3b8; }
+        .stat-value { font-size: 16px; font-weight: 700; color: #fff; }
+        .stat-highlight { color: #10b981; }
+        
+        .tags { margin-top: 16px; display: flex; gap: 10px; justify-content: center; }
+        .tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 13px; background: rgba(37,99,235,0.15);
+            color: #60a5fa; border-radius: 20px;
+            font-size: 11px; font-weight: 500;
+        }
+        .tag::before {
+            content: ''; width: 5px; height: 5px; background: #60a5fa; border-radius: 50%;
+        }
+        
+        .footer {
+            margin-top: 22px; padding: 12px; text-align: center;
+            font-size: 11px; color: #64748b;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">政</div>
+                <div>
+                    <div class="gov-name">某市行政审批局</div>
+                    <div style="font-size:16px;font-weight:700;letter-spacing:1px">智慧政务</div>
+                </div>
+            </div>
+            <div class="system-title">智能材料审核系统 · AI-Powered Document Review</div>
+            <div class="badge">✓ 已上线运营</div>
+        </div>
+        
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Left: Skill Flow -->
+            <div class="panel">
+                <div class="panel-title">Skill 智能审核流程</div>
+                <div class="skill-flow">
+                    <div class="flow-item">
+                        <div class="flow-icon">1</div>
+                        <div class="flow-text">
+                            <div class="flow-title">申请材料提交</div>
+                            <div class="flow-desc">企业/群众在线提交审批材料</div>
+                        </div>
+                        <div class="flow-status">已受理</div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-icon">2</div>
+                        <div class="flow-text">
+                            <div class="flow-title">AI 智能初审</div>
+                            <div class="flow-desc">Skill 自动识别材料内容与格式</div>
+                        </div>
+                        <div class="flow-status">运行中</div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-icon">3</div>
+                        <div class="flow-text">
+                            <div class="flow-title">缺件智能检测</div>
+                            <div class="flow-desc">自动比对并提示缺失材料清单</div>
+                        </div>
+                        <div class="flow-warning">智能提示</div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-icon">4</div>
+                        <div class="flow-text">
+                            <div class="flow-title">智能审批决策</div>
+                            <div class="flow-desc">合格自动通过，不合规即时反馈</div>
+                        </div>
+                        <div class="flow-status">秒批</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right: Features -->
+            <div class="panel">
+                <div class="panel-title">核心能力</div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">✓</div>
+                        <div class="feature-value">智能</div>
+                        <div class="feature-label">材料完整性校验</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">!</div>
+                        <div class="feature-value">缺件</div>
+                        <div class="feature-label">缺失自动指出</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <div class="feature-value">秒批</div>
+                        <div class="feature-label">合格自动通过</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-value">300%</div>
+                        <div class="feature-label">时效提升</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Section -->
+        <div class="bottom-wrapper">
+            <!-- Efficiency Highlight -->
+            <div class="efficiency-highlight">
+                <div class="big-number">300%</div>
+                <div class="big-label">材料审核时效提升</div>
+                <div class="highlight-text">
+                    传统人工审核需 <span>3-5个工作日</span> → Skill智能审核仅需 <span>2小时内</span>
+                </div>
+                <div class="missing-alert">
+                    <div class="alert-icon">!</div>
+                    <div class="alert-text">缺件自动指引："缺少营业执照复印件、法人身份证明"</div>
+                </div>
+                <div class="tags">
+                    <span class="tag">一网通办</span>
+                    <span class="tag">秒批秒办</span>
+                    <span class="tag">智能指引</span>
+                </div>
+            </div>
+            
+            <!-- Stats -->
+            <div class="stats">
+                <div class="stat-row">
+                    <span class="stat-label">今日审核量</span>
+                    <span class="stat-value stat-highlight">1,256</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">平均审核时长</span>
+                    <span class="stat-value">1.5小时</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">一次通过率</span>
+                    <span class="stat-value stat-highlight">78%</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">缺件补正指引</span>
+                    <span class="stat-value">100%</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">群众满意度</span>
+                    <span class="stat-value stat-highlight">99.2%</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            XX市行政审批局智能材料审核系统 | 采用先进的 Skill 技术架构 | 让政务服务更高效、更便捷、更智能
+        </div>
+    </div>
+</body>
+</html>

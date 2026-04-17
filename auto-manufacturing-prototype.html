@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1440">
+    <title>XX汽车集团 - 跨部门协同智造系统</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+            width: 1440px; min-height: 1080px;
+            padding: 35px 40px; color: #fff;
+        }
+        .container { width: 1360px; margin: 0 auto; }
+        
+        /* Header */
+        .header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 22px; padding: 16px 26px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .logo { display: flex; align-items: center; gap: 14px; }
+        .logo-icon {
+            width: 46px; height: 46px;
+            background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; font-weight: 800; color: #fff;
+        }
+        .company-name { font-size: 12px; color: #94a3b8; letter-spacing: 2px; }
+        .system-title {
+            font-size: 24px; font-weight: 700;
+            background: linear-gradient(90deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .badge {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 30px;
+            font-size: 12px; font-weight: 600;
+        }
+        
+        /* Main Grid */
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 22px; }
+        .panel {
+            background: rgba(255,255,255,0.03);
+            border-radius: 18px;
+            padding: 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .panel-title {
+            font-size: 14px; color: #94a3b8; margin-bottom: 18px;
+            display: flex; align-items: center; gap: 10px; font-weight: 600;
+        }
+        .panel-title::before {
+            content: ''; width: 4px; height: 16px;
+            background: linear-gradient(180deg, #f97316 0%, #fb923c 100%);
+            border-radius: 2px;
+        }
+        
+        /* Skill Flow */
+        .skill-flow { display: flex; flex-direction: column; gap: 11px; }
+        .flow-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 13px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border-left: 3px solid #f97316;
+        }
+        .flow-icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; font-weight: 700;
+        }
+        .flow-item:nth-child(1) .flow-icon { background: rgba(59,130,246,0.2); color: #60a5fa; }
+        .flow-item:nth-child(2) .flow-icon { background: rgba(249,115,22,0.2); color: #f97316; }
+        .flow-item:nth-child(3) .flow-icon { background: rgba(16,185,129,0.2); color: #10b981; }
+        .flow-item:nth-child(4) .flow-icon { background: rgba(139,92,246,0.2); color: #a78bfa; }
+        .flow-text { flex: 1; }
+        .flow-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+        .flow-desc { font-size: 11px; color: #94a3b8; }
+        .flow-status {
+            padding: 4px 11px; border-radius: 20px;
+            font-size: 11px; font-weight: 600;
+            background: rgba(16,185,129,0.15); color: #10b981;
+        }
+        .dept-tag {
+            padding: 3px 8px; border-radius: 4px;
+            font-size: 10px; font-weight: 600;
+        }
+        .dept-sales { background: rgba(59,130,246,0.2); color: #60a5fa; }
+        .dept-assembly { background: rgba(16,185,129,0.2); color: #10b981; }
+        
+        /* Metrics */
+        .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 13px; }
+        .metric-card {
+            padding: 18px 12px; background: rgba(255,255,255,0.05);
+            border-radius: 13px; text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .metric-icon { 
+            width: 32px; height: 32px; margin: 0 auto 10px;
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 700;
+        }
+        .metric-card:nth-child(1) .metric-icon { background: rgba(59,130,246,0.2); color: #60a5fa; }
+        .metric-card:nth-child(2) .metric-icon { background: rgba(249,115,22,0.2); color: #f97316; }
+        .metric-card:nth-child(3) .metric-icon { background: rgba(16,185,129,0.2); color: #10b981; }
+        .metric-card:nth-child(4) .metric-icon { background: rgba(139,92,246,0.2); color: #a78bfa; }
+        .metric-value {
+            font-size: 22px; font-weight: 700;
+            background: linear-gradient(180deg, #fff 0%, #f97316 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+        .metric-label { font-size: 11px; color: #94a3b8; }
+        
+        /* Bottom Section */
+        .bottom-wrapper { display: flex; gap: 22px; }
+        
+        .automation-highlight {
+            flex: 1.3;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 28px 32px;
+            background: linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(37,99,235,0.05) 100%);
+            border-radius: 18px;
+            border: 2px solid rgba(59,130,246,0.4);
+        }
+        .big-number {
+            font-size: 80px; font-weight: 800; color: #3b82f6;
+            text-shadow: 0 0 40px rgba(59,130,246,0.5);
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+        .big-label { font-size: 18px; color: #60a5fa; font-weight: 600; margin-bottom: 20px; }
+        .highlight-text {
+            font-size: 16px; font-weight: 600;
+            text-align: center; line-height: 1.6;
+        }
+        .highlight-text span { color: #3b82f6; font-weight: 700; }
+        
+        .collab-diagram {
+            margin-top: 18px;
+            padding: 16px 24px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            display: flex; align-items: center; gap: 20px;
+        }
+        .dept-box {
+            padding: 12px 20px; border-radius: 10px;
+            font-size: 13px; font-weight: 600;
+            text-align: center;
+        }
+        .dept-sales-box { background: rgba(59,130,246,0.2); color: #60a5fa; }
+        .dept-assembly-box { background: rgba(16,185,129,0.2); color: #10b981; }
+        .arrow {
+            color: #f97316; font-size: 20px; font-weight: 700;
+        }
+        .skill-center {
+            padding: 10px 18px; border-radius: 20px;
+            background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+            font-size: 12px; font-weight: 700;
+        }
+        
+        .stats { 
+            flex: 1;
+            display: flex; flex-direction: column; 
+            gap: 10px;
+        }
+        .stat-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 18px; background: rgba(255,255,255,0.05); border-radius: 12px;
+            flex: 1;
+        }
+        .stat-label { font-size: 12px; color: #94a3b8; }
+        .stat-value { font-size: 16px; font-weight: 700; color: #fff; }
+        .stat-highlight { color: #f97316; }
+        
+        .tags { margin-top: 16px; display: flex; gap: 10px; justify-content: center; }
+        .tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 13px; background: rgba(249,115,22,0.15);
+            color: #f97316; border-radius: 20px;
+            font-size: 11px; font-weight: 500;
+        }
+        .tag::before {
+            content: ''; width: 5px; height: 5px; background: #f97316; border-radius: 50%;
+        }
+        
+        .footer {
+            margin-top: 22px; padding: 12px; text-align: center;
+            font-size: 11px; color: #64748b;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">车</div>
+                <div>
+                    <div class="company-name">某大型汽车集团</div>
+                    <div style="font-size:16px;font-weight:700;letter-spacing:1px">AutoGroup</div>
+                </div>
+            </div>
+            <div class="system-title">跨部门协同智造系统 · Cross-Dept Collaboration</div>
+            <div class="badge">✓ 智能制造示范</div>
+        </div>
+        
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Left: Skill Flow -->
+            <div class="panel">
+                <div class="panel-title">Skill 跨部门协同流程</div>
+                <div class="skill-flow">
+                    <div class="flow-item">
+                        <div class="flow-icon">1</div>
+                        <div class="flow-text">
+                            <div class="flow-title">销售订单接入</div>
+                            <div class="flow-desc">客户需求自动同步至生产系统</div>
+                        </div>
+                        <span class="dept-tag dept-sales">销售部</span>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-icon">2</div>
+                        <div class="flow-text">
+                            <div class="flow-title">Skill 智能排产</div>
+                            <div class="flow-desc">AI 优化组装计划与资源配置</div>
+                        </div>
+                        <div class="flow-status">智能分配</div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-icon">3</div>
+                        <div class="flow-text">
+                            <div class="flow-title">组装排班执行</div>
+                            <div class="flow-desc">实时跟踪生产进度与质量</div>
+                        </div>
+                        <span class="dept-tag dept-assembly">组装部</span>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-icon">4</div>
+                        <div class="flow-text">
+                            <div class="flow-title">交付协同跟踪</div>
+                            <div class="flow-desc">全流程可视化，交付实时同步</div>
+                        </div>
+                        <div class="flow-status">已交付</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right: Metrics -->
+            <div class="panel">
+                <div class="panel-title">协同效率指标</div>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">⚡</div>
+                        <div class="metric-value">-40%</div>
+                        <div class="metric-label">订单响应时间</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">📊</div>
+                        <div class="metric-value">+35%</div>
+                        <div class="metric-label">排产准确率</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">🚚</div>
+                        <div class="metric-value">-25%</div>
+                        <div class="metric-label">交付周期</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">85%</div>
+                        <div class="metric-value">自动化</div>
+                        <div class="metric-label">流程自动化率</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Section -->
+        <div class="bottom-wrapper">
+            <!-- Automation Highlight -->
+            <div class="automation-highlight">
+                <div class="big-number">85%</div>
+                <div class="big-label">流程自动化率</div>
+                <div class="highlight-text">
+                    销售与组装部门通过 <span>Skill 智能中枢</span> 实现无缝协同<br>
+                    订单处理、排产排班、交付跟踪全流程自动化
+                </div>
+                <div class="collab-diagram">
+                    <div class="dept-box dept-sales-box">销售部<br><span style="font-size:11px;font-weight:400">订单系统</span></div>
+                    <div class="arrow">→</div>
+                    <div class="skill-center">SKILL 智能中枢</div>
+                    <div class="arrow">→</div>
+                    <div class="dept-box dept-assembly-box">组装部<br><span style="font-size:11px;font-weight:400">生产系统</span></div>
+                </div>
+                <div class="tags">
+                    <span class="tag">智能制造</span>
+                    <span class="tag">跨部门协同</span>
+                    <span class="tag">流程自动化</span>
+                </div>
+            </div>
+            
+            <!-- Stats -->
+            <div class="stats">
+                <div class="stat-row">
+                    <span class="stat-label">今日处理订单</span>
+                    <span class="stat-value stat-highlight">486</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">平均排产时间</span>
+                    <span class="stat-value">15分钟</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">人工介入率</span>
+                    <span class="stat-value stat-highlight">15%</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">协同响应速度</span>
+                    <span class="stat-value">实时</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">月度交付达成</span>
+                    <span class="stat-value stat-highlight">98.5%</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            XX汽车集团跨部门协同智造系统 | 采用先进的 Skill 技术架构 | 让制造更智能、协同更高效、交付更准时
+        </div>
+    </div>
+</body>
+</html>

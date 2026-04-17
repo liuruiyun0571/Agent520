@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HX协议酒店与餐厅查询系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        .header p { opacity: 0.9; font-size: 1.1em; }
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .nav-tab {
+            padding: 15px 35px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .nav-tab:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
+        .nav-tab.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 18px 25px 18px 55px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .search-box input:focus { box-shadow: 0 15px 50px rgba(0,0,0,0.2); }
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 22px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.3em;
+        }
+        .search-box .clear-btn {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #f0f0f0;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+        .search-box .clear-btn.visible { display: flex; }
+        .content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            min-height: 500px;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-size: 0.95em;
+        }
+        .stat-card span { font-size: 1.5em; font-weight: bold; margin-right: 5px; }
+        .hotel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 25px;
+        }
+        .hotel-card {
+            background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 16px;
+            padding: 25px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+        }
+        .hotel-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+        .hotel-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .hotel-star {
+            background: #ffd700;
+            color: #333;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+        .hotel-info {
+            display: grid;
+            gap: 8px;
+            color: #555;
+            font-size: 0.9em;
+        }
+        .hotel-info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .hotel-info-label {
+            color: #667eea;
+            font-weight: 600;
+            min-width: 70px;
+            flex-shrink: 0;
+        }
+        .hotel-info-value { flex: 1; word-break: break-all; }
+        .room-table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+            font-size: 0.85em;
+        }
+        .room-table th {
+            background: #667eea;
+            color: white;
+            padding: 10px 8px;
+            text-align: left;
+        }
+        .room-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .room-table tr:hover { background: #f5f5f5; }
+        .price-original { text-decoration: line-through; color: #999; }
+        .price-deal { color: #e74c3c; font-weight: bold; }
+        .restaurant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 25px;
+        }
+        .restaurant-card {
+            background: linear-gradient(145deg, #fff9f0 0%, #fff5e6 100%);
+            border-radius: 16px;
+            padding: 25px;
+            border-left: 5px solid #f39c12;
+            transition: all 0.3s ease;
+        }
+        .restaurant-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+        .restaurant-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .restaurant-number {
+            background: #f39c12;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        .restaurant-info {
+            display: grid;
+            gap: 10px;
+            color: #555;
+            font-size: 0.95em;
+        }
+        .restaurant-info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .restaurant-info-label {
+            color: #f39c12;
+            font-weight: 600;
+            min-width: 70px;
+            flex-shrink: 0;
+        }
+        .restaurant-info-value { flex: 1; }
+        .restaurant-note {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(243, 156, 18, 0.1);
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.6;
+        }
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        .no-results-icon { font-size: 4em; margin-bottom: 20px; }
+        .no-results h3 { font-size: 1.5em; color: #666; margin-bottom: 10px; }
+        .phone-link { color: #667eea; text-decoration: none; font-weight: 500; }
+        .phone-link:hover { text-decoration: underline; }
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.8em; }
+            .nav-tab { padding: 12px 25px; font-size: 1em; }
+            .hotel-grid, .restaurant-grid { grid-template-columns: 1fr; }
+            .content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏨 HX协议酒店与餐厅查询系统</h1>
+            <p>快速查询协议酒店、挂账餐厅信息</p>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="hangzhou-hotel">🏨 杭州协议酒店（27家）</button>
+            <button class="nav-tab" data-tab="hangzhou-restaurant">🍽️ 杭州挂账餐厅（12家）</button>
+            <button class="nav-tab" data-tab="beijing-hotel">🏨 北京协议酒店（1家）</button>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="输入关键词搜索：酒店名称、地点、房型、价格、联系人...">
+            <button class="clear-btn" id="clearBtn">×</button>
+        </div>
+        
+        <div class="content">
+            <div class="tab-content active" id="hangzhou-hotel">
+                <div class="stats">
+                    <div class="stat-card"><span id="hzHotelCount">27</span>家酒店</div>
+                    <div class="stat-card"><span id="hzRoomCount">192</span>种房型</div>
+                </div>
+                <div class="hotel-grid" id="hzHotelGrid"></div>
+                <div class="no-results" id="hzHotelNoResults" style="display:none;">
+                    <div class="no-results-icon">🔍</div>
+                    <h3>未找到匹配结果</h3>
+                    <p>请尝试其他关键词</p>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="hangzhou-restaurant">
+                <div class="stats">
+                    <div class="stat-card"><span id="hzRestCount">12</span>家餐厅</div>
+                </div>
+                <div class="restaurant-grid" id="hzRestGrid"></div>
+                <div class="no-results" id="hzRestNoResults" style="display:none;">
+                    <div class="no-results-icon">🔍</div>
+                    <h3>未找到匹配结果</h3>
+                    <p>请尝试其他关键词</p>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="beijing-hotel">
+                <div class="stats">
+                    <div class="stat-card"><span id="bjHotelCount">1</span>家酒店</div>
+                    <div class="stat-card"><span id="bjRoomCount">2</span>种房型</div>
+                </div>
+                <div class="hotel-grid" id="bjHotelGrid"></div>
+                <div class="no-results" id="bjHotelNoResults" style="display:none;">
+                    <div class="no-results-icon">🔍</div>
+                    <h3>未找到匹配结果</h3>
+                    <p>请尝试其他关键词</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const hzHotels = [{
+    name: "杭州文源宾馆",
+    star: "三星",
+    type: "会议/住宿",
+    contact: "姚旭伟：13456782438",
+    location: "文晖路108号 ",
+    note: "和平国际会展中心步行10分钟路程",
+    rooms: [{type: '普通单间', price: '460', deal: '238（不含早）早餐另加15元'}, {type: '豪华单间', price: '500', deal: '258（不含早）早餐另加15元'}, {type: '商务标准、大床房', price: '650', deal: '288（不含早）早餐另加15元'}, {type: '豪华标间、大床房', price: '800', deal: '338（不含早）早餐另加15元'}, {type: '套房A', price: '1280', deal: '588（不含早）早餐另加15元'}, {type: '套房B', price: '880', deal: '488（不含早）早餐另加15元'}]
+},
+    {
+    name: "杭州玉皇山庄",
+    star: "四星",
+    type: "会议/住宿",
+    contact: "郭晨：15558181018",
+    location: "玉皇山路74号",
+    note: "2018年重新装修，位于西湖十景之一的玉皇飞云景区内，毗邻雷峰塔、花港观鱼，与西湖近在咫尺。玉皇食府中餐厅主营正宗杭帮菜和山西纯手工面食。",
+    rooms: [{type: '悦景双床房', price: '1588', deal: '488（含早）'}, {type: '精致大床房', price: '1888', deal: '498（含早）'}, {type: '雅致大床房', price: '1988', deal: '558（含早）'}, {type: '怡景双床房', price: '1988', deal: '558（含早）'}, {type: '园景双床房', price: '2288', deal: '658（含早）'}, {type: '丽景双床房', price: '2588', deal: '698（含早）'}, {type: '豪华休闲双床房、大床房', price: '2988', deal: '798（含早）'}, {type: '行政房', price: '3388', deal: '880（含早）'}, {type: '玉皇套房', price: '3988', deal: '1680（含早）'}]
+},
+    {
+    name: "杭州仁和饭店",
+    star: "四星",
+    type: "会议/住宿",
+    contact: "     来云焘：15868803336",
+    location: "邮电路86号",
+    note: "酒店距西子湖畔数步之遥的，具有得天独厚的地理位置，交通极为便利，周边大型时尚购物中心IN77，西湖新天地、湖滨国际名品街。",
+    rooms: [{type: '雅·商大床房', price: null, deal: '500（含早）'}, {type: '暻·双床房', price: null, deal: '500（含早）'}, {type: '豪华大床房', price: null, deal: '550（含早）'}, {type: '豪华双床房', price: null, deal: '600（含早）'}, {type: '轻奢大床房', price: null, deal: '650（含早）'}, {type: '景观家庭房', price: null, deal: '850（含早）'}, {type: '暻·家庭房', price: null, deal: '900（含早）'}, {type: '西湖亲子房', price: null, deal: '1000（含早）'}, {type: '西湖全景房', price: null, deal: '1200（含早）'}, {type: '西湖主题连通房', price: null, deal: '1300（含早）'}, {type: '西湖露台家庭套房', price: null, deal: '1800（含早）'}]
+},
+    {
+    name: "杭州纳德世家",
+    star: "四星",
+    type: "会议/住宿",
+    contact: "傅林峰：15868891608",
+    location: "环城北路308号",
+    note: "2018年重新装修，位于杭城市中心，东面毗邻繁华的武林广场，北面坐拥西湖文化广场，南面正对着时尚的武林女装街和美丽的西子湖，地理位置优越。",
+    rooms: [{type: '高级标准房、大床房', price: '1726', deal: '498（含双早）'}, {type: '豪华标准房、大床房', price: '1860', deal: '558（含双早）'}, {type: '商务标准房、大床房', price: '1993', deal: '598（含双早）'}, {type: '市井标准间', price: '2193', deal: '658（含双早）'}, {type: '市井大床房', price: '2293', deal: '658（含双早）'}, {type: '湖景大床房', price: '2526', deal: '758（含双早）'}, {type: '行政大床房', price: '2660', deal: '798（含双早）'}, {type: '商务套房', price: '4226', deal: '1388（含双早）'}, {type: '行政三间套房', price: '6420', deal: '1888（含双早）'}]
+},
+    {
+    name: "杭州新侨饭店",
+    star: "五星",
+    type: "会议/住宿",
+    contact: "李子桐：15867153393",
+    location: "上城区解放路226号",
+    note: "2018年重新装修，近延安路，步行到西湖5分钟，隔壁为湖滨银泰，十楼的西湖全景花园更可提供别具一格的露台式茶宴/婚宴；十七楼餐厅，可观180度西湖全景和杭城市景。",
+    rooms: [{type: '普通标房、单人间', price: '1080', deal: '498（含早）'}, {type: '豪华标房、单人间', price: '1280', deal: '598（含早）'}, {type: '行政房', price: '1580', deal: '698（含早）'}, {type: '雅致行政房', price: '2180', deal: '998（含早）'}, {type: '套房', price: '3000', deal: '998（含早）'}, {type: '行政套房', price: '3980', deal: '1398（含早）'}, {type: '总统套房', price: '10800', deal: '8800（含早）'}]
+},
+    {
+    name: "杭州蝶来浙江宾馆",
+    star: "五星",
+    type: "会议/住宿",
+    contact: "王智敏：18857867586     ",
+    location: "西湖区三台山路278号",
+    note: "2016年装修，与龙井茶园相眺望，北面抬眼便是新西湖景区，茅乡水景，尽收眼底。",
+    rooms: [{type: '商务房', price: '1265', deal: '平季：周日至周四600，周五至周六650                              旺季：周日至周四650，周五至周六700'}, {type: '丽景房', price: '1495', deal: '平季：周日至周四650，周五至周六700                               旺季：周日至周四700，周五至周六750'}, {type: '商务高级大床房', price: '1725', deal: '平季：周日至周四750，周五至周六800                              旺季：周日至周四800，周五至周六850'}, {type: '商务套房', price: '3105', deal: '平季：周日至周四2200，周五至周六2500                          旺季：周日至周四2200，周五至周六2500'}, {type: '3号楼行政房', price: '1725', deal: '平季：周日至周四750，周五至周六800                                旺季：周日至周四800，周五至周六850'}, {type: '3号楼行政豪华大床房', price: '1955', deal: '平季：周日至周四800，周五至周六850                              旺季：周日至周四850，周五至周六900'}]
+},
+    {
+    name: "杭州国大雷迪森广场酒店",
+    star: "五星",
+    type: "会议/住宿",
+    contact: "陈信：15868120288",
+    location: "体育场路333号",
+    note: "市中心黄金地段，拥有室内游泳池以及健身中心",
+    rooms: [{type: '高级房 ', price: null, deal: '650单早750双早'}]
+},
+    {
+    name: "西湖柳莺里酒店",
+    star: "五星",
+    type: "会议/住宿",
+    contact: "王璐：13666696056",
+    location: "上城区南山路清波桥河下6号",
+    note: "2016年重新装修，西湖黄金湖岸线，与“三潭印月”隔湖相望，“柳浪闻莺”隔墙相邻，有专用码头可直接上船游览西湖。客房装饰是浓郁的中国江南文化特色，此外还有亲湖咖啡吧、牛排馆、“慢生活”艺术书吧、泳池。",
+    rooms: [{type: '园景大床房', price: '2980', deal: '淡季：（1、2、12）   周日-周四850，周五周六1050                                                                          平季：（3、5、6、9、11）周日-周四950、周五周六1150                                                                       旺季：（4、7、8、10）周日-周四1100、周五周六1300                         '}, {type: '园景高级大床房', price: '3380', deal: '淡季：（1、2、12）   周日-周四1060，周五周六1050                                                                          平季：（3、5、6、9、11）周日-周四950、周五周六1250                                                                       旺季：（4、7、8、10）周日-周四1500、周五周六1800                         '}, {type: '园景高级亲子房', price: '3580', deal: '淡季：（1、2、12）   周日-周四1450，周五周六1650                                                                          平季：（3、5、6、9、11）周日-周四1550、周五周六1850                                                                  旺季：（4、7、8、10）周日-周四1700、周五周六2000                         '}, {type: '园景豪华大（双）床房', price: '3780', deal: '淡季：（1、2、12）   周日-周四1650，周五周六1850                                                                          平季：（3、5、6、9、11）周日-周四1750、周五周六2050                                                                   旺季：（4、7、8、10）周日-周四1900、周五周六2200                         '}, {type: '园景行政大床房', price: '3980', deal: '淡季：（1、2、12）   周日-周四1850，周五周六2050                                                                          平季：（3、5、6、9、11）周日-周四1950、周五周六2250                                                                  旺季：（4、7、8、10）周日-周四2100、周五周六2400                         '}, {type: '湖景行政大床房', price: '4380', deal: '淡季：（1、2、12）   周日-周四2050，周五周六2250                                                                          平季：（3、5、6、9、11）周日-周四2150、周五周六2450                                                                  旺季：（4、7、8、10）周日-周四2300、周五周六2600                         '}, {type: '湖景豪华大床房', price: '4980', deal: '淡季：（1、2、12）   周日-周四2650，周五周六2850                                                                          平季：（3、5、6、9、11）周日-周四2750、周五周六3050                                                                  旺季：（4、7、8、10）周日-周四2900、周五周六3200                         '}, {type: '湖景行政豪华大床房', price: '5180', deal: '淡季：（1、2、12）   周日-周四2850，周五周六3050                                                                          平季：（3、5、6、9、11）周日-周四2950、周五周六3250                                                                  旺季：（4、7、8、10）周日-周四3100、周五周六3400                         '}]
+},
+    {
+    name: "杭州西湖大华饭店",
+    star: "五星",
+    type: "会议/住宿",
+    contact: "赵晨：13588837303",
+    location: "上城区南山路171号",
+    note: "2016年装修，在美丽的西子湖畔，采用古典庭院式建筑。",
+    rooms: [{type: '标准房（单、双）', price: '2800', deal: '淡季898、旺季998（含早）'}, {type: '侧湖景房（单）', price: '3500', deal: '淡季1098、旺季1198（含早）'}, {type: '豪华房（单、双）', price: '3500', deal: '淡季1098、旺季1198（含早）'}, {type: '精品房（标）', price: '4800', deal: '淡季1298、旺季1398（含早）'}, {type: '精品房（单）', price: '4800', deal: '淡季1398、旺季1598（含早）'}, {type: '亲水湖景房（单）', price: '10800', deal: '淡季2888-4888、旺季3888-5888（含早）'}, {type: '商务套房', price: '5800', deal: '淡季3380、旺季3980（含早）'}, {type: '豪华湖景套房', price: '13800', deal: '淡季4280、旺季4880（含早）'}, {type: '水云阁套房', price: '108000', deal: '淡季33800、旺季39800（含早）'}]
+},
+    {
+    name: "杭州运河黄龙璀丽酒店",
+    star: "不挂牌五星",
+    type: "会议/住宿",
+    contact: "章剑：13456943613",
+    location: "拱墅区丽水路7号",
+    note: "非遗特色酒店之一，隶属于浙江黄龙酒店管理集团。毗邻“香积寺”， 距“富义仓”仅几步之遥。由11栋原国家厂丝仓库设计、改造而成。独特的开放式设计，将璀璨的人文景观与运河秀美的自然景色合二为一。",
+    rooms: [{type: '豪华房型（大床/双床)', price: null, deal: '420(含1-2份早餐)'}, {type: '至尊房型（大床/双床)', price: null, deal: '450(含1-2份早餐)'}, {type: '豪华大床/双床套房57平方', price: null, deal: '1000(含1-2份早餐)'}, {type: '运河大床套房65平方', price: null, deal: '1500(含1-2份早餐)'}, {type: '祁利总统套房86平方', price: null, deal: '2000(含1-2份早餐)'}]
+},
+    {
+    name: "广电开元名都大酒店",
+    star: "不挂牌五星",
+    type: "会议/住宿",
+    contact: "戚红艳：13588032022",
+    location: " 萧山区弘慧路399号",
+    note: "开元酒店集团，是浙江广播电视集团投资兴建的酒店，2017年开业 ",
+    rooms: [{type: '高级双床房、大床房', price: '1680', deal: '580（含早）'}, {type: '豪华双床房、大床房', price: '1880', deal: '640（含早）'}, {type: '家庭双床房', price: '2080', deal: '700（含早）'}, {type: '行政大床房', price: '2380', deal: '760（含早）'}, {type: '行政套房', price: '3380', deal: '1280（含早）'}, {type: '行政豪华套房', price: '3880', deal: '1580（含早）'}]
+},
+    {
+    name: "杭州陆羽君澜度假酒店",
+    star: "不挂牌五星",
+    type: "会议/住宿",
+    contact: "施海波：18969096963",
+    location: "余杭区径山镇大竹园18-1-3号，径山镇双溪漂流景区内",
+    note: " 2017年重新装修开业，毗邻茶道发源地——径山寺，与陆羽泉隔溪相望，四季皆宜的山沟沟景区。“茶圣”陆羽曾在此深研茶事，并撰写了著名的《茶经》，被后世供为圣典，",
+    rooms: [{type: '标准双床房、大床房', price: '1300', deal: '500、周末600'}, {type: '园景双床房、大床房', price: '1600', deal: '600、周末700'}, {type: '景观双床房、大床房', price: '2200', deal: '700、周末700'}, {type: '景观套房', price: '4000', deal: '1400、周末1600'}, {type: '泉系复式别墅', price: '8800', deal: '4000、周末4500'}, {type: '竹系复式别墅', price: '9800', deal: '4500、周末5000'}, {type: '茗系复式别墅', price: '11800', deal: '4700、周末5200'}, {type: '多功能复式别墅', price: '14800', deal: '5000、周末5500'}]
+},
+    {
+    name: "杭州瑞立江河汇酒店",
+    star: "不挂牌五星",
+    type: "会议/住宿",
+    contact: "吴小军：15068739968",
+    location: "杭州市江干区之江路1299号 ",
+    note: "2016年开业，凭窗眺望水天一线的钱塘江景，室内游泳池。",
+    rooms: [{type: '城景单间无浴缸', price: '1088元+10%服务费', deal: '450（含早）无浴缸'}, {type: '城景高级房(标间/大床)', price: '1288元+10%服务费', deal: '498（含早）'}, {type: '江景单间无浴缸', price: '1298元+10%服务费', deal: '500（含早）'}, {type: '江景高级房 (标 间/大床)', price: '1388元+10%服务费', deal: '528（含早）'}, {type: '江景行政房 (大床)', price: '1688元+10%服务费', deal: '698（含早）'}, {type: '江景豪华套房', price: '2688元+10%服务费', deal: '1388（含早）'}, {type: '江景行政套房', price: '3888元+10%服务费', deal: '2388（含早）'}]
+},
+    {
+    name: "杭州白马湖建国饭店",
+    star: "不挂牌五星",
+    type: "会议/住宿",
+    contact: "陈吴芳：13588790087",
+    location: "滨江区长江南路336号",
+    note: "2012年开业，位于杭州滨江区重点发展项目——白马湖生态创意城。",
+    rooms: [{type: '高级房 ', price: '1300+15%服务费', deal: '438（含单早）498（含双早）'}, {type: '豪华房', price: '1480+15%服务费', deal: '538（含单早）498（含双早）'}, {type: '小套房', price: '1680+15%服务费', deal: '880（含早）'}, {type: '高级套房', price: '2200+15%服务费', deal: '1080（含早）'}, {type: '豪华套房', price: '2980+15%服务费', deal: '1380（含早）'}, {type: '豪华复式套房', price: '4850+15%服务费', deal: '2880（含早）'}]
+},
+    {
+    name: "杭州钱潮开元酒店",
+    star: "不挂牌五星",
+    type: "会议/住宿",
+    contact: "张计红：13858009462",
+    location: "滨江区江南大道288号",
+    note: "2019年开业，客房布置具有中国风，典雅大气。",
+    rooms: [{type: '标准大床房', price: '1098', deal: '400（含双早）'}, {type: '高级大床房', price: '1198', deal: '450（含双早）'}, {type: '豪华双床房', price: '1298', deal: '450（含双早）'}, {type: '国风特大床房', price: '1348', deal: '550（含双早）'}, {type: '豪华大床房', price: '1298', deal: '580（含双早）'}, {type: '尊享双床房', price: '1348', deal: '580（含双早）'}, {type: '尊享大床房', price: '1348', deal: '600（含双早）'}, {type: '行政套房', price: '2098', deal: '1200（含双早）'}, {type: '行政大床房', price: '1498', deal: '700（含双早）'}]
+},
+    {
+    name: "杭州歌山品悦大酒店",
+    star: "四星",
+    type: "会议/住宿",
+    contact: "余海红：15258025068",
+    location: "滨江区江虹路1537号 ，近江南大道。",
+    note: "2011年开业，悦咖啡全日餐厅，俯瞰杭州新城和美丽的钱江夜景，美不胜收。",
+    rooms: [{type: '品悦豪华大床、双床房 ', price: '1080', deal: '458（含早）'}, {type: '品悦雅致大床、双床房 ', price: '1280', deal: '538（含早）'}, {type: '品悦大床房', price: '1380', deal: '608（含早）'}, {type: '品悦行政房', price: '1480', deal: '658（含早）'}, {type: '行政套房', price: '2588', deal: '1088（含早）'}, {type: '品悦套房', price: '4888', deal: '2188（含早）'}]
+},
+    {
+    name: "杭州诗莉莉漫戈塔-天池高空江景酒店",
+    star: "不挂牌五星",
+    type: "会议/住宿",
+    contact: "操琳琳：15068120991",
+    location: "滨江区江晖路杭州印A座36楼",
+    note: "酒店隶属于君澜酒店集团，2017年开业，网红酒店，座落于杭州的重要地标建筑杭州印，现代轻奢主义，房间36层以上，都可以看到江景。每年7-9月份，酒店顶层天际无边镜面泳池免费开放",
+    rooms: [{type: '云端雅致私密大床房', price: '628', deal: '平季380、89月份450（含早）'}, {type: '云漫·45°江景大床房', price: '668', deal: '平季450、89月份550（含早）'}, {type: '云池·临江城景大床房', price: '688', deal: '平季500、89月份550（含早）'}, {type: '云戈·30°江景双床房', price: '758', deal: '平季550、89月份600（含早）'}, {type: '云戈·90°江景大床房', price: '828', deal: '平季600、89月份600（含早）'}, {type: '云塔·90°江景大床房、双床房', price: '898', deal: '平季700、89月700（含早）'}, {type: '云天·临江城景 VR 行政房', price: '998', deal: '平季800、89月800（含早）'}, {type: '云印·90°江景一室一卧套房', price: '1388', deal: '平季900、89月900（含早）'}, {type: '云境·270°江景阳台双卧公馆套房', price: '3088', deal: '平季1800、89月1800（含早）'}]
+},
+    {
+    name: "杭州滨江龙湖天街亚朵酒店",
+    star: "四星",
+    type: "会议/住宿",
+    contact: "尤红旭：13588169862",
+    location: "滨江区长河街道江一云境商业中心一幢1层",
+    note: "酒店坐落滨江CBD核心地段，2026年3月开业，设施非常新。",
+    rooms: [{type: '高级大床、双床', price: null, deal: '400（含早）'}, {type: '行政大床房', price: null, deal: '450（含早）'}, {type: '尊享大床、双床房', price: null, deal: '480（含早）'}, {type: '尊享城景大床房', price: null, deal: '550（含早）'}, {type: '尊享城景套房', price: null, deal: '600（含早）'}]
+},
+    {
+    name: "杭州滨江天街开元名庭酒店",
+    star: "四星",
+    type: "会议/住宿",
+    contact: "宋能：17328861093",
+    location: "滨江区江晖路918号，中赢创谷大厦A幢",
+    note: "开元酒店集团下属酒店，中赢国际综合体，距离公司仅一条马路。",
+    rooms: [{type: '高级大床房', price: '588', deal: '320（含早）'}, {type: '豪华大床房', price: '688', deal: '350（含早）'}, {type: '行政大床方/双床房', price: '788', deal: '380（含早）'}, {type: '城景大床方/双床房', price: '888', deal: '420（含早）'}, {type: '贰陆、豪华大床房', price: '1188', deal: '440（含早）'}, {type: '贰陆、豪华双床房', price: '1188', deal: '460（含早）'}, {type: '豪华亲子套房', price: '1588', deal: '500（含早）'}, {type: '行政套房', price: '2088', deal: '500（含早）'}, {type: '贰陆、豪华套房', price: '2588', deal: '680（含早）'}]
+},
+    {
+    name: "杭州滨江开元名庭酒店",
+    star: "四星",
+    type: "会议/住宿",
+    contact: "杜敏杰：18069792220",
+    location: "滨江区滨和路998号",
+    note: "开元酒店集团下属酒店，距离浙二滨江分院约1000米距离。酒店提供夜宵，每晚21:00-22:30分。",
+    rooms: [{type: '商务大床房', price: '1108', deal: '320（含早餐、宵夜）'}, {type: '高级双床房', price: '1108', deal: '380（含早餐、宵夜）'}, {type: '豪华大床房', price: '1180', deal: '380（含早餐、宵夜）'}, {type: '豪华双床房', price: '1180', deal: '400（含早餐、宵夜）'}, {type: '行政大床房', price: '1280', deal: '450（含早餐、宵夜）'}, {type: '阳台行政双床房', price: '1280', deal: '480（含早餐、宵夜）'}, {type: '开元精选大床房', price: '1588', deal: '500（含早餐、宵夜）'}, {type: '行政商务大床房', price: '1588', deal: '528（含早餐、宵夜）'}, {type: '开元商务套房', price: '1888', deal: '800（含早餐、宵夜）'}]
+},
+    {
+    name: "杭州滨江天街书香世家酒店",
+    star: "四星",
+    type: "会议/住宿",
+    contact: "密文斌：13958030446",
+    location: "滨江区春晓路61号 ",
+    note: "酒店布置温馨、诗礼之家，吸引你的不仅仅是千年茶韵。吃夜宵的好去处，康康谷旁边。",
+    rooms: [{type: '雅致书香大床房', price: '788+15%', deal: '350（不含早）380（含早）'}, {type: '雅致书香双床房', price: '868+15%', deal: '350（不含早）380（含早）'}, {type: '茶韵大床房', price: '958+15%', deal: '400（不含早）430（含早）'}, {type: '茶韵双床房', price: '1288+15%', deal: '400（不含早）430（含早）'}, {type: '探花大床房', price: '1380+15%', deal: '450（不含早）480（含早）'}, {type: '探花双床房', price: '1580+15%', deal: '450（不含早）480（含早）'}, {type: '家庭房（连通房）', price: '1880+15%', deal: '719（含早）'}]
+},
+    {
+    name: "御湘湖养生度假酒店",
+    star: "不挂牌五星",
+    type: "会议/住宿",
+    contact: "章辉：15988111330",
+    location: "萧山区湘湖路3333号",
+    note: "每间客房配备空气过滤系统来抗衡PM2.5的浓度，房间以其承载的独特功能命名",
+    rooms: [{type: '无霾大床房、双床房', price: '1288', deal: '498（含早）'}, {type: '乐活亲子房', price: '1588', deal: '698（含早）'}, {type: '海底小纵队亲子房', price: '2108', deal: '898（含早）'}, {type: '悦活亲子房', price: '2108', deal: '798（含早）'}, {type: '乐享棋牌房', price: '2108', deal: '898（含早）'}, {type: '悠活家庭套房', price: '3988', deal: '1798（含早）'}, {type: '养心庭院套房', price: '4588', deal: '2098（含早）'}, {type: '悦享套房（双床房）', price: '1588', deal: '598（含早）'}, {type: '悦享套房（大床房）', price: '1588', deal: '598（含早）'}, {type: '悦享睡眠房（双床房）', price: '1788', deal: '598（含早）'}, {type: '尊享套房', price: '2588', deal: '1088（含早）'}, {type: '臻享家庭套房', price: '3988', deal: '1798（含早）'}, {type: '御享总套', price: '12888', deal: '4888（含早）'}]
+},
+    {
+    name: "滨江开元名都大酒店",
+    star: "不挂牌五星",
+    type: "会议/住宿",
+    contact: "商发玲：13868047706",
+    location: "滨江火炬大道岩大房巷59号",
+    note: "滨江火炬大道，毗邻钱塘江、距离雷峰塔、宋城、湘湖等景点15分钟车程。",
+    rooms: [{type: '高级大床房', price: null, deal: '428含单早、468含双早'}, {type: '高级双床房', price: null, deal: '458含单早、498含双早'}, {type: '豪华大床房、双床房', price: null, deal: '498含单早、538含双早'}, {type: '行政大床房', price: null, deal: '598含单早、638含双早'}, {type: '高级套房', price: null, deal: '998（含早）'}, {type: '豪华套房', price: null, deal: '1298（含早）'}]
+},
+    {
+    name: "杭州万斯酒店",
+    star: "四星",
+    type: "会议/住宿",
+    contact: "罗萝姿：18276732057",
+    location: "滨盛路2077号",
+    note: "酒店位于钱塘江畔、拥有智能化客房，可以一览江景的空中餐厅以及空中大堂。餐厅属于现代风格，免费为华信设计入住客人提供下午茶（对外收费68元一位）",
+    rooms: [{type: '精致大床房', price: '638+10%服务费', deal: '400（含早）'}, {type: '高级大床房', price: '718+10%服务费', deal: '450（含早）'}, {type: '高级双床房', price: '788+10%服务费', deal: '500（含双早）'}, {type: '豪华大床房', price: '788+10%服务费', deal: '538（含早）'}, {type: '豪华双床房', price: '888+10%服务费', deal: '538（含早）'}, {type: '行政大床房', price: '888+10%服务费', deal: '618（含早）'}, {type: '行政双床房', price: '1028+10%服务费', deal: '618（含早）'}, {type: '高级套房', price: '1218+10%服务费', deal: '788（含早）'}, {type: '豪华套房', price: '1368+10%服务费', deal: '878（含早）'}]
+},
+    {
+    name: "杭州江南智选假日酒店",
+    star: "三星",
+    type: "会议/住宿",
+    contact: "赖佩玲：18600554944",
+    location: "建业路1076号中廊大厦A座",
+    note: "毗邻钱塘江，拥有江景、城景房清新时尚的客房，宽敞的空间配备65寸液晶电视。",
+    rooms: [{type: '高级大床房、双床房', price: '499', deal: '388（含早）'}, {type: '城景高级大床房', price: '559', deal: '458（含早）'}, {type: '豪华双床房', price: '599', deal: '488（含早）'}, {type: '江景豪华大床房', price: '639', deal: '518（含早）'}, {type: '270°城景豪华大床房', price: '679', deal: '558（含早）'}, {type: '270°江景豪华大床房', price: '739', deal: '598（含早）'}]
+},
+    {
+    name: "杭州澜居酒店",
+    star: "三星",
+    type: "会议/住宿",
+    contact: "赖佩玲：18600554944",
+    location: "建业路1076号中廊大厦A座",
+    note: "",
+    rooms: [{type: '标准大床房、双床房', price: '459', deal: '350（含早）'}, {type: '高级大床房、双床房', price: '529', deal: '398（含早）'}, {type: '城景豪华 大床房、双床房', price: '559', deal: '458（含早）'}, {type: '城景豪华 大床房、双床房', price: '609', deal: '508（含早）'}]
+},
+    {
+    name: "杭州网宿酒店",
+    star: "三星",
+    type: "住宿",
+    contact: "朴健文：13606575757",
+    location: "滨江区西兴街道滨康路228号万福中心B座",
+    note: "",
+    rooms: [{type: '城景双床房、大床', price: '288', deal: '208（含早）'}, {type: '商务城景双床房、大床', price: '368', deal: '238（含早）'}]
+}];
+        const bjHotels = [{
+    name: "北京万方苑国际酒店",
+    star: "四星",
+    type: "会议/住宿",
+    contact: "李芳芳：18910020134",
+    location: "北京市丰台区南三环西路4号",
+    note: "",
+    rooms: [{type: '标准商务双床房', price: '1088', deal: '480（含早）'}, {type: '标准商务大床房', price: '1388', deal: '480（含早）'}]
+}];
+        const hzRestaurants = [{
+    name: "新花中城（湖墅店）",
+    contact: "吴东芳",
+    phone: "15057186511",
+    address: "杭州市湖墅南路107号",
+    note: "主营杭帮菜、粤菜"
+},
+    {
+    name: "藏鲜工坊",
+    contact: "谢梅",
+    phone: "13456716721",
+    address: "杭州市朝晖路108号，和平饭店2号楼",
+    note: "品尝舟山海鲜的最佳选择"
+},
+    {
+    name: "锦香来（奥体店）",
+    contact: "丁主管",
+    phone: "15088736552",
+    address: "杭州市滨江区民祥路观澜路交叉口钱江世纪城公园E2栋",
+    note: "主营浙菜，周边环境好可以散步，比较清静，适合宴请中高端客户。"
+},
+    {
+    name: "群乐饭店",
+    contact: "廖小丽",
+    phone: "13958154854",
+    address: "杭州市滨江区滨安路1197号（信诚路交叉口）",
+    note: "老字号饭店，农家菜比较有特色。"
+},
+    {
+    name: "西陵饭店",
+    contact: "夏莉",
+    phone: "13666691878",
+    address: "杭州市滨江区滨安路118号（西兴地铁站旁边）",
+    note: "农家菜，距离公司很近。"
+},
+    {
+    name: "湘湖茗醉园",
+    contact: "华经理",
+    phone: "18967128030",
+    address: "萧山区湘湖景区湖山广场音乐喷泉东侧湖边",
+    note: "长乔极地海洋公园对面，餐厅就在湘湖边，景色宜人，可以喝茶散步。面对湘湖全景的独立湖景包厢（能容纳18人）只有一个，要提前2天以上预订，还有一艘船，可以开出去一个小时，坐在船上的包厢用餐感觉也是不错的。餐厅其他包厢也有很多，露天散座。每年的6-8月晚上可以观赏喷泉（观赏时间待定）。主营农家菜、菜品丰富。"
+},
+    {
+    name: "德悦海鲜大酒店（滨江店）",
+    contact: "吴立新",
+    phone: "15925618067",
+    address: "滨盛路1766号华联星光大道二期五楼德悦酒店",
+    note: "主营江河湖海鲜、菜品多、口味好，有30多个大小包厢"
+},
+    {
+    name: "德悦海鲜大酒店（城西店）",
+    contact: "鲍杰领",
+    phone: "13588894048",
+    address: "古翠路108号（近西湖国际的大厦）",
+    note: "主营江河湖海鲜、粤菜，37个大小包厢"
+},
+    {
+    name: "德悦海鲜大酒店（钱江新城店）",
+    contact: "黄建慧",
+    phone: "15867142119",
+    address: "滨江高德置地广场4楼402商铺",
+    note: "粤式茶点、江鲜、海鲜、个别包厢可以看到钱江新城大金球"
+},
+    {
+    name: "宴谭餐厅（江浙融合菜）",
+    contact: "黄淑勤",
+    phone: "18958103317",
+    address: "滨江区泰安路239号盾安发展大厦4楼",
+    note: "商务型会所，创意融合菜和地方菜为主。食材很新鲜，特别是海鲜餐品。环境非常不错，还有茶艺表演。"
+},
+    {
+    name: "新时代碧湘楼酒店",
+    contact: "沈楼英",
+    phone: "13758166878",
+    address: "湘湖路湘湖景区湖边云洲敛翠（罗家坞停车场内）",
+    note: "湘酒店坐落在湘湖边，可以喝茶散步，环境宜人。大部分都是面湖的包厢，餐厅古香古色，主营创意菜。"
+},
+    {
+    name: "新滨安",
+    contact: "李春燕",
+    phone: "13735521659",
+    address: "滨江区西行路399号玲珑府3幢51号",
+    note: "地道江鲜，始于1991，传承滨江好味道。"
+}];
+
+        function renderHotels(hotels, containerId, noResultsId) {
+            const container = document.getElementById(containerId);
+            const noResults = document.getElementById(noResultsId);
+            
+            if (hotels.length === 0) {
+                container.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            container.innerHTML = hotels.map(hotel => `
+                <div class="hotel-card" data-search="${(hotel.name + ' ' + hotel.location + ' ' + hotel.contact + ' ' + hotel.note + ' ' + hotel.rooms.map(r => r.type).join(' ')).toLowerCase()}">
+                    <div class="hotel-name">
+                        ${hotel.name}
+                        <span class="hotel-star">${hotel.star}</span>
+                    </div>
+                    <div class="hotel-info">
+                        <div class="hotel-info-row">
+                            <span class="hotel-info-label">📍 地点</span>
+                            <span class="hotel-info-value">${hotel.location || '-'}</span>
+                        </div>
+                        <div class="hotel-info-row">
+                            <span class="hotel-info-label">📞 联系</span>
+                            <span class="hotel-info-value">${hotel.contact || '-'}</span>
+                        </div>
+                        <div class="hotel-info-row">
+                            <span class="hotel-info-label">🏷️ 类型</span>
+                            <span class="hotel-info-value">${hotel.type}</span>
+                        </div>
+                        ${hotel.note ? `
+                        <div class="hotel-info-row">
+                            <span class="hotel-info-label">📝 备注</span>
+                            <span class="hotel-info-value">${hotel.note}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    <table class="room-table">
+                        <thead>
+                            <tr>
+                                <th>房型</th>
+                                <th>门市价</th>
+                                <th>协议价</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${hotel.rooms.map(room => `
+                                <tr>
+                                    <td>${room.type}</td>
+                                    <td class="price-original">${room.price ? '¥' + room.price : '-'}</td>
+                                    <td class="price-deal">${room.deal}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `).join('');
+        }
+
+        function renderRestaurants(restaurants, containerId, noResultsId) {
+            const container = document.getElementById(containerId);
+            const noResults = document.getElementById(noResultsId);
+            
+            if (restaurants.length === 0) {
+                container.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            container.innerHTML = restaurants.map((restaurant, index) => `
+                <div class="restaurant-card" data-search="${(restaurant.name + ' ' + restaurant.address + ' ' + restaurant.contact + ' ' + restaurant.note).toLowerCase()}">
+                    <div class="restaurant-name">
+                        <span class="restaurant-number">${index + 1}</span>
+                        ${restaurant.name}
+                    </div>
+                    <div class="restaurant-info">
+                        <div class="restaurant-info-row">
+                            <span class="restaurant-info-label">👤 联系人</span>
+                            <span class="restaurant-info-value">${restaurant.contact || '-'}</span>
+                        </div>
+                        <div class="restaurant-info-row">
+                            <span class="restaurant-info-label">📞 电话</span>
+                            <span class="restaurant-info-value">
+                                <a href="tel:${restaurant.phone}" class="phone-link">${restaurant.phone}</a>
+                            </span>
+                        </div>
+                        <div class="restaurant-info-row">
+                            <span class="restaurant-info-label">📍 地址</span>
+                            <span class="restaurant-info-value">${restaurant.address || '-'}</span>
+                        </div>
+                    </div>
+                    ${restaurant.note ? `
+                    <div class="restaurant-note">
+                        <strong>💡 特色：</strong>${restaurant.note}
+                    </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function performSearch(keyword) {
+            const lowerKeyword = keyword.toLowerCase().trim();
+            
+            ['hzHotelGrid', 'hzRestGrid', 'bjHotelGrid'].forEach((gridId, idx) => {
+                const cards = document.querySelectorAll('#' + gridId + ' > div');
+                const noResultsId = ['hzHotelNoResults', 'hzRestNoResults', 'bjHotelNoResults'][idx];
+                let visible = 0;
+                cards.forEach(card => {
+                    const searchText = card.getAttribute('data-search') || '';
+                    if (!lowerKeyword || searchText.includes(lowerKeyword)) {
+                        card.style.display = 'block';
+                        visible++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                document.getElementById(noResultsId).style.display = visible === 0 && lowerKeyword ? 'block' : 'none';
+            });
+        }
+
+        function init() {
+            renderHotels(hzHotels, 'hzHotelGrid', 'hzHotelNoResults');
+            renderRestaurants(hzRestaurants, 'hzRestGrid', 'hzRestNoResults');
+            renderHotels(bjHotels, 'bjHotelGrid', 'bjHotelNoResults');
+            
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab).classList.add('active');
+                });
+            });
+            
+            const searchInput = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('clearBtn');
+            
+            searchInput.addEventListener('input', (e) => {
+                performSearch(e.target.value);
+                clearBtn.classList.toggle('visible', e.target.value.length > 0);
+            });
+            
+            clearBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                performSearch('');
+                clearBtn.classList.remove('visible');
+                searchInput.focus();
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>

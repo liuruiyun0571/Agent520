@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: cloud-performance-backend
+    runtime: node
+    buildCommand: |
+      cd backend && npm install
+      cd ../frontend && npm install && npm run build
+    startCommand: cd backend && NODE_ENV=production node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DB_PATH
+        value: /tmp/data.sqlite
+      - key: DINGTALK_CORP_ID
+        value: ding706ecb8da3a63f6dbc961a6cb783455b
+      - key: DINGTALK_AGENT_ID
+        value: 4476839008
+      - key: DINGTALK_APP_KEY
+        value: dingwerhjmrjkssctcri
+      - key: DINGTALK_APP_SECRET
+        value: 5zuSpP5gEUDUsdw4MxdAVV-IQJQz6SnpvBkyAEjzkugmfe4nfqTiI5YKMZm12IyU
