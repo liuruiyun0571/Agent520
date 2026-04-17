@@ -3,9 +3,8 @@
  * 自动创建表结构和默认数据
  */
 
-const { sequelize, syncDatabase } = require('../src/models');
+const { sequelize, syncDatabase, User, Role, GlobalConfig } = require('../src/models');
 const bcrypt = require('bcryptjs');
-const { User, Role, GlobalConfig } = require('../src/models');
 
 async function initDatabase() {
   try {
