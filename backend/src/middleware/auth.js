@@ -3,7 +3,7 @@ const authConfig = require('../config/auth');
 const { error } = require('../utils/response');
 
 // JWT认证中间件
-const auth = (req, res, next) => {
+const authenticate = (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
     
@@ -20,7 +20,7 @@ const auth = (req, res, next) => {
 };
 
 // 角色权限检查
-const checkRole = (...roles) => {
+const authorize = (...roles) => {
   return (req, res, next) => {
     if (!req.user) {
       return res.status(401).json(error(401, '未认证'));
@@ -34,4 +34,10 @@ const checkRole = (...roles) => {
   };
 };
 
-module.exports = { auth, checkRole };
+// 兼容旧名称导出
+module.exports = { 
+  authenticate, 
+  authorize,
+  auth: authenticate,
+  checkRole: authorize
+};
