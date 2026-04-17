@@ -24,7 +24,6 @@ import {
   Icon,
   Popup,
   Picker,
-  DatetimePicker,
   DatePicker,
   Uploader,
   Card,
@@ -65,7 +64,7 @@ const app = createApp(App);
 const components = [
   Button, NavBar, Tabbar, TabbarItem, Cell, CellGroup,
   Field, Form, Toast, Dialog, Loading, List, PullRefresh,
-  Search, Tag, Icon, Popup, Picker, DatetimePicker, DatePicker, Uploader,
+  Search, Tag, Icon, Popup, Picker, DatePicker, Uploader,
   Card, Grid, GridItem, NoticeBar, SwipeCell, Empty, Tabs, Tab, Table,
   Progress, Circle, Collapse, CollapseItem, FloatingBubble,
   Stepper, Switch, Checkbox, CheckboxGroup, Radio, RadioGroup,
